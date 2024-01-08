@@ -16,7 +16,7 @@ Before you begin, ensure you have the following:
    - Follow the instructions to install Rust and Cargo (Rust's package manager and build tool).
 
 2. **Download the Game:**
-   - Clone or download the game's source code from its repository (provide the link here if available).
+   - Clone this repository on your device.
    - Navigate to the game's root directory in your terminal.
 
 ### Running the Game
