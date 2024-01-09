@@ -8,13 +8,13 @@ fn main() {
     let secret_num = thread_rng().gen_range(1..=100);
 
     loop {
-        let mut guess_str = String::new();
+        let mut guess = String::new();
         println!("Enter a number");
         io::stdin()
-            .read_line(&mut guess_str)
+            .read_line(&mut guess)
             .expect("Failed to read line");
 
-        let guess: u32 = match guess_str.trim().parse() {
+        let guess: u32 = match guess.trim().parse() {
             Ok(num) => num,
             Err(_) => continue,
         };
