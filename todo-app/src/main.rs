@@ -1,19 +1,19 @@
-use std::io::{stdout, Write};
+use std::io::{stdin, stdout, Write};
 
 use crossterm::{
     cursor,
     event::{read, Event, KeyCode},
     execute, queue,
-    style::{self, Attribute, Attributes, Color, ResetColor, SetAttributes, SetForegroundColor},
+    style::{self, Attribute, Attributes, Color, SetAttributes, SetForegroundColor},
     terminal::{self, disable_raw_mode, enable_raw_mode, Clear, ClearType},
 };
 
-struct Todo<'a> {
-    title: &'a str,
+struct Todo {
+    title: String,
     completed: bool,
 }
 
-impl Todo<'_> {
+impl Todo {
     fn toggle(&mut self) {
         self.completed = !self.completed;
     }
@@ -22,11 +22,11 @@ impl Todo<'_> {
 fn main() {
     let mut todo_list: Vec<Todo> = vec![
         Todo {
-            title: "Go to market",
+            title: String::from("Go to market"),
             completed: false,
         },
         Todo {
-            title: "Go to gym",
+            title: String::from("Go to gym"),
             completed: true,
         },
     ];
@@ -48,6 +48,18 @@ fn main() {
                 KeyCode::Char(' ') => {
                     todo_list.get_mut(curr_index).unwrap().toggle();
                 }
+                KeyCode::Enter => {
+                    execute!(stdout(), Clear(ClearType::All), cursor::MoveTo(0, 0)).unwrap();
+                    let mut todo = String::new();
+                    disable_raw_mode().unwrap();
+                    stdin().read_line(&mut todo).expect("Failed to read line");
+
+                    todo_list.push(Todo {
+                        title: todo.trim().parse().unwrap(),
+                        completed: false,
+                    });
+                    enable_raw_mode().unwrap();
+                }
                 KeyCode::Esc => {
                     // Clear the screen before exiting
                     execute!(stdout(), Clear(ClearType::All), cursor::MoveTo(0, 0)).unwrap();
@@ -64,12 +76,10 @@ fn main() {
 }
 
 fn render_todo_list(todo_list: &Vec<Todo>, curr_index: usize) {
-    execute!(
+    queue!(
         stdout(),
         terminal::Clear(terminal::ClearType::All),
         cursor::MoveTo(0, 0),
-        style::Print("Esc to exit"),
-        cursor::MoveToNextLine(1)
     )
     .unwrap();
 
@@ -99,6 +109,16 @@ fn render_todo_list(todo_list: &Vec<Todo>, curr_index: usize) {
         )
         .unwrap();
     }
+
+    queue!(
+        stdout(),
+        cursor::MoveToNextLine(1),
+        style::Print("Esc to exit"),
+        cursor::MoveToNextLine(1),
+        style::Print("Enter to add new todo"),
+        cursor::MoveToNextLine(1)
+    )
+    .unwrap();
 
     stdout().flush().unwrap();
 }
